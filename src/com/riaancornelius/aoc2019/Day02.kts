@@ -3,7 +3,7 @@ package com.riaancornelius.aoc2019
 import com.riaancornelius.aoc2019.input.Input
 import java.lang.RuntimeException
 
-class Day02a {
+class Day02 {
     private var intCode = readInput()
 
     private fun readInput(): IntArray {
@@ -13,12 +13,13 @@ class Day02a {
             .toIntArray()
     }
 
-    fun runCalculation() {
-        intCode[1] = 12
-        intCode[2] = 2
+    fun runCalculation(noun: Int, verb:Int): Int {
+        intCode[1] = noun
+        intCode[2] = verb
+
         program@ for (index in intCode.indices step 4) {
-            intCode.forEach { print("${it.toString().padEnd(7)} ") }
-            println()
+//            intCode.forEach { print("${it.toString().padEnd(7)} ") }
+//            println()
             when (intCode[index]){
                 1 -> opCode1(intCode[index+1], intCode[index+2], intCode[index+3])
                 2 -> opCode2(intCode[index+1], intCode[index+2], intCode[index+3])
@@ -26,8 +27,7 @@ class Day02a {
                 else -> throw RuntimeException("You screwed up something")
             }
         }
-        println()
-        println(intCode[0])
+        return intCode[0]
     }
 
     private fun opCode1(position1: Int, position2: Int, outPutPosition: Int) {
@@ -41,5 +41,6 @@ class Day02a {
     }
 }
 
-Day02a().runCalculation()
+// Part 1:
+println(Day02().runCalculation(12, 2))
  
