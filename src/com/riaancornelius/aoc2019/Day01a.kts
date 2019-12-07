@@ -6,14 +6,13 @@ import kotlin.math.truncate
 class Day01a {
 
     fun readFileLineByLineUsingForEachLine() : Int {
-        var fuelRequired = 0
         val input = Input()
-        input.getFile(1, false).forEachLine { fuelRequired += calculateFuelForModule(it.toDouble()) }
-//        println("Part1: Total fuel required: $fuelRequired")
-        return fuelRequired
+        return input.readLines(1)
+            .mapToInt{ calculateFuelForModule(it.toDouble()) }
+            .sum()
     }
 
-    fun calculateFuelForModule(mass: Double): Int {
+    private fun calculateFuelForModule(mass: Double): Int {
         // mass, divide by three, round down, and subtract 2.
         val fuelRequired = truncate(mass / 3).toInt() - 2
 //        println("Module weight: $mass requires: $fuelRequired")

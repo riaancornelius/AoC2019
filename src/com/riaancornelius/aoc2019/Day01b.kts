@@ -7,14 +7,11 @@ import kotlin.math.truncate
 class Day01b {
 
     fun readFileLineByLineUsingForEachLine() : Int {
-        var fuelRequired = 0
         val input = Input()
-        input.getFile(1, false).forEachLine {
-            fuelRequired += calculateFuelIncludingFuel(
-                calculateFuelForModule(it.toDouble()))
-        }
-//        println("Part1: Total fuel required: $fuelRequired")
-        return fuelRequired
+        return input.readLines(1)
+            .mapToInt{ calculateFuelForModule(it.toDouble()) }
+            .map { calculateFuelIncludingFuel(it) }
+            .sum()
     }
 
     private fun calculateFuelForModule(mass: Double): Int {
