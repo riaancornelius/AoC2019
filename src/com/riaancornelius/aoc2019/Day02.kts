@@ -42,5 +42,12 @@ class Day02 {
 }
 
 // Part 1:
-println(Day02().runCalculation(12, 2))
- 
+//println(Day02().runCalculation(12, 2))
+
+// Part 2:
+val expectedOutput = 19690720
+// Need to figure out how to avoid the fact that they are nullable
+val noun = (0..99).findLast { Day02().runCalculation(it, 0) < expectedOutput }
+val verb = (0..99).find { noun?.let { it1 -> Day02().runCalculation(it1, it) } == expectedOutput }
+
+println("${100 * noun!! + verb!!}")
