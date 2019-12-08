@@ -1,9 +1,8 @@
 package com.riaancornelius.aoc2019
 
 import com.riaancornelius.aoc2019.input.Input
-import java.lang.RuntimeException
 
-class Day08 {
+class Day08a {
     private var input = readInput()
 
     private fun readInput(): String {
@@ -31,4 +30,4 @@ class Day08 {
 }
 
 // Part 1:
-Day08().decode(25, 6)
+Day08a().decode(25, 6)
