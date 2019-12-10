@@ -10,9 +10,11 @@ class Computer(private val inputString :String) {
             .map { it.toInt() }
             .toIntArray()
     }
-    fun runCalculation(vararg updates :Pair<Int, Int> ): Int {
+
+    fun runCalculation(input :Int = 0, vararg updates :Pair<Int, Int> ): MutableList<Int> {
         updates.forEach { instructions[it.first] = it.second }
 
+        val output = mutableListOf<Int>()
         var pointer = 0
         programLoop@ while (pointer < instructions.size) {
             val currentInstruction = Instruction.parse(instructions[pointer])
@@ -21,17 +23,27 @@ class Computer(private val inputString :String) {
             println("Checking position [$pointer] with value $currentInstruction")
             pointer += when (currentOpCode){
                 1 -> {
-                    opCode1(instructions[pointer+1], instructions[pointer+2], instructions[pointer+3])
+                    val param1 = read(pointer + 1, currentInstruction.mode1)
+                    val param2 = read(pointer + 2, currentInstruction.mode2)
+                    write(pointer + 3, param1 + param2)
+                    println(" -> ${instructions[pointer + 1]}, ${instructions[pointer + 2]}, ${instructions[pointer + 3]}")
                     4
                 }
                 2 -> {
-                    opCode2(instructions[pointer+1], instructions[pointer+2], instructions[pointer+3])
+                    val param1 = read(pointer + 1, currentInstruction.mode1)
+                    val param2 = read(pointer + 2, currentInstruction.mode2)
+                    write(pointer + 3, param1 * param2)
+                    println(" -> ${instructions[pointer + 1]}, ${instructions[pointer + 2]}, ${instructions[pointer + 3]}")
                     4
                 }
                 3 -> {
+                    write(pointer + 1, input)
+                    println(" -> ${instructions[pointer + 1]}}")
                     2
                 }
                 4 -> {
+                    println(" -> ${instructions[pointer + 1]}}")
+                    output.add(read(pointer + 1, currentInstruction.mode1))
                     2
                 }
                 99 -> break@programLoop
@@ -39,26 +51,22 @@ class Computer(private val inputString :String) {
             }
         }
 
-        return instructions[0]
+        return output
     }
 
-    private fun opCode1(position1: Int, position2: Int, outPutPosition: Int) {
-        val output = instructions[position1] + instructions[position2]
-        instructions[outPutPosition] = output
+    fun read(position :Int, mode:Mode) :Int {
+        return if (mode == Mode.IMMEDIATE) instructions[position] else instructions[instructions[position]]
     }
 
-    private fun opCode2(position1: Int, position2: Int, outPutPosition: Int) {
-        val output = instructions[position1] * instructions[position2]
-        instructions[outPutPosition] = output
+    private fun write(position :Int, value :Int){
+        instructions[instructions[position]] = value
     }
 
     data class Instruction(val opCode :Int, val mode1 : Mode, val mode2 : Mode, val mode3 : Mode) {
-
-
         companion object {
             fun parse(input: Int) : Instruction {
                 val string = input.toString().padStart(5, '0')
-//                println("Parsing $input padded to $string")
+                println("Parsing $input padded to $string")
                 return Instruction(
                     string.substring(string.lastIndex-1, string.length).toInt(),
                     when(string[2]) {
