@@ -1,7 +1,4 @@
-package com.riaancornelius.aoc2019.instructions
-
-import com.riaancornelius.aoc2019.input.Input
-import java.lang.RuntimeException
+package com.riaancornelius.aoc2019.intcode
 
 class Computer(private val inputString :String) {
 
@@ -13,21 +10,35 @@ class Computer(private val inputString :String) {
             .map { it.toInt() }
             .toIntArray()
     }
+    fun runCalculation(vararg updates :Pair<Int, Int> ): Int {
+        updates.forEach { instructions[it.first] = it.second }
 
-    fun runCalculation(noun: Int, verb:Int): Int {
-        instructions[1] = noun
-        instructions[2] = verb
+        var pointer = 0
+        programLoop@ while (pointer < instructions.size) {
+            val currentInstruction = Instruction.parse(instructions[pointer])
+            val currentOpCode = currentInstruction.opCode
 
-        program@ for (index in instructions.indices step 4) {
-//            instructions.forEach { print("${it.toString().padEnd(7)} ") }
-//            println()
-            when (instructions[index]){
-                1 -> opCode1(instructions[index+1], instructions[index+2], instructions[index+3])
-                2 -> opCode2(instructions[index+1], instructions[index+2], instructions[index+3])
-                99 -> break@program
-                else -> throw RuntimeException("You screwed up something")
+            println("Checking position [$pointer] with value $currentInstruction")
+            pointer += when (currentOpCode){
+                1 -> {
+                    opCode1(instructions[pointer+1], instructions[pointer+2], instructions[pointer+3])
+                    4
+                }
+                2 -> {
+                    opCode2(instructions[pointer+1], instructions[pointer+2], instructions[pointer+3])
+                    4
+                }
+                3 -> {
+                    2
+                }
+                4 -> {
+                    2
+                }
+                99 -> break@programLoop
+                else -> throw RuntimeException("Unsupported OpCode found [$currentOpCode]")
             }
         }
+
         return instructions[0]
     }
 
@@ -39,5 +50,40 @@ class Computer(private val inputString :String) {
     private fun opCode2(position1: Int, position2: Int, outPutPosition: Int) {
         val output = instructions[position1] * instructions[position2]
         instructions[outPutPosition] = output
+    }
+
+    data class Instruction(val opCode :Int, val mode1 : Mode, val mode2 : Mode, val mode3 : Mode) {
+
+
+        companion object {
+            fun parse(input: Int) : Instruction {
+                val string = input.toString().padStart(5, '0')
+//                println("Parsing $input padded to $string")
+                return Instruction(
+                    string.substring(string.lastIndex-1, string.length).toInt(),
+                    when(string[2]) {
+                        '1'  -> Mode.IMMEDIATE
+                        else -> Mode.POSITION
+                    },
+                    when(string[1]) {
+                        '1'  -> Mode.IMMEDIATE
+                        else -> Mode.POSITION
+                    },
+                    when(string[0]) {
+                        '1'  -> Mode.IMMEDIATE
+                        else -> Mode.POSITION
+                    }
+                )
+            }
+        }
+
+        override fun toString(): String {
+            return "Instruction(opCode=$opCode, mode1=$mode1, mode2=$mode2, mode3=$mode3)"
+        }
+    }
+
+    enum class Mode {
+        POSITION,
+        IMMEDIATE
     }
 }
