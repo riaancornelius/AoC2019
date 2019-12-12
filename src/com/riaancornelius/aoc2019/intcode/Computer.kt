@@ -11,11 +11,13 @@ class Computer(private val inputString :String) {
             .toIntArray()
     }
 
-    fun runCalculation(input :Int = 0, vararg updates :Pair<Int, Int> ): MutableList<Int> {
+    fun runCalculation(input :IntArray = arrayOf(0).toIntArray(),
+                       vararg updates :Pair<Int, Int> ): MutableList<Int> {
         updates.forEach { instructions[it.first] = it.second }
 
         val output = mutableListOf<Int>()
         var pointer = 0
+        var inputPointer = 0
         programLoop@ while (pointer < instructions.size) {
             val currentInstruction = Instruction.parse(instructions[pointer])
             val currentOpCode = currentInstruction.opCode
@@ -37,7 +39,7 @@ class Computer(private val inputString :String) {
                     4
                 }
                 3 -> {
-                    write(pointer + 1, input)
+                    write(pointer + 1, input[inputPointer++])
                     println(" -> ${instructions[pointer + 1]}}")
                     2
                 }

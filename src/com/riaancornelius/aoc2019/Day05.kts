@@ -5,4 +5,5 @@ import com.riaancornelius.aoc2019.intcode.Computer
 
 val inputString = Input().readText(5, false)
 // Part 1:
-println("Part 1: ${Computer(inputString).runCalculation(1)}")
+println("Part 1: ${Computer(inputString).runCalculation(arrayOf(1).toIntArray())}")
+
