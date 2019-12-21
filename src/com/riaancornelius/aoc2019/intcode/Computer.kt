@@ -1,6 +1,11 @@
 package com.riaancornelius.aoc2019.intcode
 
+import com.riaancornelius.aoc2019.collection.Queue
+
 class Computer(private val inputString :String, private val debug :Boolean = false) {
+
+    public var completed = false
+    var pointer = 0
 
     private val instructions = readInput()
     
@@ -11,13 +16,23 @@ class Computer(private val inputString :String, private val debug :Boolean = fal
             .toIntArray()
     }
 
-    fun runCalculation(input :IntArray = arrayOf(0).toIntArray(),
-                       vararg updates :Pair<Int, Int> ): MutableList<Int> {
+    fun startCalculation(
+        input: Queue<Int> = Queue(),
+        vararg updates: Pair<Int, Int>): MutableList<Int> {
+//        print("Inputs: ")
+//        input.forEach { print("$it, ") }
+//        println("")
+//        print("Updates: ")
+//        updates.forEach { print("$it, ") }
+//        println("")
         updates.forEach { instructions[it.first] = it.second }
 
+        return runCalculation(input)
+    }
+
+    fun runCalculation(input :Queue<Int> = Queue()): MutableList<Int> {
         val output = mutableListOf<Int>()
-        var pointer = 0
-        var inputPointer = 0
+
         programLoop@ while (pointer < instructions.size) {
             val currentInstruction = Instruction.parse(instructions[pointer])
             val currentOpCode = currentInstruction.opCode
@@ -41,9 +56,17 @@ class Computer(private val inputString :String, private val debug :Boolean = fal
                     pointer += 4
                 }
                 3 -> {
-                    if (debug) print(" -> ${instructions[pointer + 1]}, input[$inputPointer] = ${input[inputPointer]}")
-                    write(pointer + 1, input[inputPointer++])
-                    pointer += 2
+                    val peek = input.peek()
+                    if (debug) {
+                        print(" -> ${instructions[pointer + 1]}, input.peek() = $peek")
+                    }
+                    if (peek != null) {
+                        write(pointer + 1, input.dequeue()!!)
+                        pointer += 2
+                    } else {
+                        // Suspend program if there isn't any inputs available
+                        break@programLoop
+                    }
                 }
                 4 -> {
                     if (debug) print(" -> ${instructions[pointer + 1]}")
@@ -82,13 +105,16 @@ class Computer(private val inputString :String, private val debug :Boolean = fal
                     write(pointer + 3, run {if(param1 == param2) 1 else 0})
                     pointer += 4
                 }
-                99 -> break@programLoop
+                99 -> {
+                    this.completed = true
+                    break@programLoop
+                }
                 else -> throw RuntimeException("Unsupported OpCode found [$currentOpCode]")
             }
             if (debug) println("\n")
         }
 
-        println()
+        if (debug) println()
         return output
     }
 
