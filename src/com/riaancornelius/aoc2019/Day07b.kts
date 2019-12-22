@@ -7,10 +7,10 @@ import com.riaancornelius.aoc2019.intcode.Computer
 val phases = Input().permutations("56789")
 val instructions= Input().readText(7)
 
-val values = mutableMapOf<String, Int>()
+val values = mutableMapOf<String, Long>()
 phases.forEach {
 //    println("Running $it")
-    val inputValues = it.map { char -> char.toString().toInt() }
+    val inputValues = it.map { char -> char.toString().toLong() }
     println("Running $inputValues")
     var stillRunning = true
     val i0 = Computer(instructions)
@@ -19,7 +19,7 @@ phases.forEach {
     val i3 = Computer(instructions)
     val i4 = Computer(instructions)
 
-    val inputs = Queue(mutableListOf(inputValues[0], 0))
+    val inputs = Queue(mutableListOf(inputValues[0], 0L))
 
     var out0 = i0.startCalculation(inputs)
     stillRunning = stillRunning && !i0.completed
